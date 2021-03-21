@@ -16,7 +16,7 @@ public class AllRepository {
     TaskRepository taskRepository;
     TaskResultRepository taskResultRepository;
 
-    public <IdType, EntityType, T extends CrudRepository<EntityType, IdType>> T getRepository(Class clazz) throws ClassNotFoundException {
+    public <IdType, EntityType, T extends CrudRepository<EntityType, IdType>> T getRepository(Class<?> clazz) throws ClassNotFoundException {
         if(UserDto.class.isAssignableFrom(clazz)) {
             return (T)userRepository;
         } else if(User.class.isAssignableFrom(clazz)) {

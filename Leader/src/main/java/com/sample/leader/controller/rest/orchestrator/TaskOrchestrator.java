@@ -5,24 +5,37 @@ import com.sample.leader.model.dto.task.TaskDto;
 import com.sample.leader.model.dto.task.TaskResultDto;
 import com.sample.leader.model.entity.task.TaskResult;
 import com.sample.leader.repository.AllRepository;
+import com.sample.leader.transport.TransportApi;
 import com.sample.leader.utils.Converter;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @Service
 public class TaskOrchestrator extends Orchestrator{
-    public TaskOrchestrator(Converter converter, AllRepository repositoryBuilder) {
+    TransportApi transportApi;
+    @Value("#{'${leader.worker.hosts}'.split(',')}")
+    private List<String> hosts;
+
+
+    @Autowired
+    public TaskOrchestrator(Converter converter, AllRepository repositoryBuilder,
+                            TransportApi transportApi) {
         super(converter, repositoryBuilder);
+        this.transportApi = transportApi;
     }
 
     public TaskResultDto startExecuteTask(StartTaskDto startTask) throws ClassNotFoundException {
         TaskDto task = get(startTask.getIdTask(), TaskDto.class);
         TaskResultDto taskResult = null;
+        Boolean l = transportApi.isAvailableWorker(hosts.get(1));
         if(task != null) {
             taskResult = new TaskResultDto();
             taskResult.setTask(task);
@@ -30,6 +43,8 @@ public class TaskOrchestrator extends Orchestrator{
             taskResult.setTimeStart(new Date().getTime());
 
             put(taskResult, TaskResultDto.class, TaskResult.class);
+
+
         }
 
         return taskResult;
