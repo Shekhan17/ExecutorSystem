@@ -48,4 +48,9 @@ public class TaskController {
         return orchestrator.startExecuteTask(dto);
     }
 
+    @PostMapping("/putResult")
+    public void putResultTask(@RequestBody TaskResultDto dto) throws ClassNotFoundException {
+        orchestrator.putResultTask(dto);
+    }
+
 }

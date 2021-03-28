@@ -35,18 +35,28 @@ public class TaskOrchestrator extends Orchestrator{
     public TaskResultDto startExecuteTask(StartTaskDto startTask) throws ClassNotFoundException {
         TaskDto task = get(startTask.getIdTask(), TaskDto.class);
         TaskResultDto taskResult = null;
-        Boolean l = transportApi.isAvailableWorker(hosts.get(1));
-        if(task != null) {
+        String executorHost = null;
+        for(String host : hosts) {
+            if(transportApi.isAvailableWorker(host)) {
+                executorHost = host;
+                break;
+            }
+        }
+
+        if(task != null && executorHost != null) {
             taskResult = new TaskResultDto();
             taskResult.setTask(task);
             taskResult.setAuthor(startTask.getAuthor());
             taskResult.setTimeStart(new Date().getTime());
 
             put(taskResult, TaskResultDto.class, TaskResult.class);
-
-
+            transportApi.sendTask(executorHost + "/api/v1/task/start", task);
         }
 
         return taskResult;
+    }
+
+    public void putResultTask(TaskResultDto dto) throws ClassNotFoundException  {
+
     }
 }
